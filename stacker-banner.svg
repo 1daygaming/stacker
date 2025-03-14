@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="640" height="360" viewBox="0 0 640 360" xmlns="http://www.w3.org/2000/svg">
+  <!-- Фон -->
+  <rect width="640" height="360" fill="#4a6572" />
+  
+  <!-- Градиентный фон -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2c3e50" />
+      <stop offset="100%" stop-color="#34495e" />
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#bgGradient)" />
+  
+  <!-- Игровое поле (сетка) -->
+  <g transform="translate(170, 130)">
+    <!-- Горизонтальные линии сетки -->
+    <line x1="0" y1="0" x2="300" y2="0" stroke="#ffffff" stroke-width="2" stroke-opacity="0.3" />
+    <line x1="0" y1="50" x2="300" y2="50" stroke="#ffffff" stroke-width="2" stroke-opacity="0.3" />
+    <line x1="0" y1="100" x2="300" y2="100" stroke="#ffffff" stroke-width="2" stroke-opacity="0.3" />
+    <line x1="0" y1="150" x2="300" y2="150" stroke="#ffffff" stroke-width="2" stroke-opacity="0.3" />
+    
+    <!-- Вертикальные линии сетки -->
+    <line x1="0" y1="0" x2="0" y2="150" stroke="#ffffff" stroke-width="2" stroke-opacity="0.3" />
+    <line x1="50" y1="0" x2="50" y2="150" stroke="#ffffff" stroke-width="2" stroke-opacity="0.3" />
+    <line x1="100" y1="0" x2="100" y2="150" stroke="#ffffff" stroke-width="2" stroke-opacity="0.3" />
+    <line x1="150" y1="0" x2="150" y2="150" stroke="#ffffff" stroke-width="2" stroke-opacity="0.3" />
+    <line x1="200" y1="0" x2="200" y2="150" stroke="#ffffff" stroke-width="2" stroke-opacity="0.3" />
+    <line x1="250" y1="0" x2="250" y2="150" stroke="#ffffff" stroke-width="2" stroke-opacity="0.3" />
+    <line x1="300" y1="0" x2="300" y2="150" stroke="#ffffff" stroke-width="2" stroke-opacity="0.3" />
+  </g>
+  
+  <!-- Кубик (изометрическая проекция) -->
+  <g transform="translate(320, 180)">
+    <!-- Верхняя грань -->
+    <polygon points="0,-40 40,-20 0,0 -40,-20" fill="#4CAF50" stroke="#388E3C" stroke-width="2" />
+    
+    <!-- Левая грань -->
+    <polygon points="-40,-20 0,0 0,40 -40,20" fill="#2196F3" stroke="#1976D2" stroke-width="2" />
+    
+    <!-- Правая грань -->
+    <polygon points="0,0 40,-20 40,20 0,40" fill="#F44336" stroke="#D32F2F" stroke-width="2" />
+    
+    <!-- Числа на гранях -->
+    <text x="0" y="-15" font-family="Arial" font-size="24" font-weight="bold" fill="white" text-anchor="middle">1</text>
+    <text x="-20" y="15" font-family="Arial" font-size="24" font-weight="bold" fill="white" text-anchor="middle">3</text>
+    <text x="20" y="15" font-family="Arial" font-size="24" font-weight="bold" fill="white" text-anchor="middle">4</text>
+  </g>
+  
+  <!-- Название игры -->
+  <text x="320" y="70" font-family="Arial" font-size="48" font-weight="bold" fill="white" text-anchor="middle">STACKER</text>
+  
+  <!-- Подзаголовок -->
+  <text x="320" y="110" font-family="Arial" font-size="20" fill="white" text-anchor="middle">Головоломка с кубиком</text>
+  
+  <!-- Декоративные элементы -->
+  <circle cx="120" cy="70" r="30" fill="#4CAF50" fill-opacity="0.3" />
+  <circle cx="520" cy="70" r="30" fill="#F44336" fill-opacity="0.3" />
+  
+  <!-- Инструкция -->
+  <text x="320" y="320" font-family="Arial" font-size="16" fill="white" text-anchor="middle">Перекатывайте кубик и собирайте числа от 1 до 6</text>
+</svg> 
