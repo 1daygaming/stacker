@@ -1,0 +1,13 @@
+{
+  "name": "stacker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/1daygaming/stacker.git",
+  "author": "Alexander Gradov <gradovas@1gaming.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@types/three": "^0.174.0",
+    "three": "^0.174.0",
+    "vite": "^6.2.2"
+  }
+}
