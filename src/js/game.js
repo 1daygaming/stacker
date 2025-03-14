@@ -22,6 +22,13 @@ export class Game {
     this.board = null;
     this.cube = null;
     this.cubePositionHelper = null;
+    
+    // Вспомогательные объекты для отладки
+    this.debugHelpers = {
+      enabled: true,
+      axesHelper: null,
+      gridHelper: null
+    };
   }
 
   init() {
@@ -113,21 +120,27 @@ export class Game {
     // Добавляем игровое поле
     this.scene.add(this.board.mesh);
     
+    // Устанавливаем ссылку на сцену для куба
+    this.cube.setScene(this.scene);
+    
     // Добавляем кубик
     this.scene.add(this.cube.mesh);
     
     // Добавляем вспомогательный объект для визуализации позиции кубика
     this.scene.add(this.cubePositionHelper);
     
-    // Добавляем вспомогательные оси координат
-    const axesHelper = new THREE.AxesHelper(this.boardSize.width * this.cellSize);
-    this.scene.add(axesHelper);
-    
-    // Добавляем вспомогательную сетку
-    const gridSize = this.boardSize.width * this.cellSize * 2;
-    const gridDivisions = this.boardSize.width * 2;
-    const gridHelper = new THREE.GridHelper(gridSize, gridDivisions);
-    this.scene.add(gridHelper);
+    // Добавляем вспомогательные объекты для отладки
+    if (this.debugHelpers.enabled) {
+      // Добавляем вспомогательные оси координат
+      this.debugHelpers.axesHelper = new THREE.AxesHelper(this.boardSize.width * this.cellSize);
+      this.scene.add(this.debugHelpers.axesHelper);
+      
+      // Добавляем вспомогательную сетку
+      const gridSize = this.boardSize.width * this.cellSize * 2;
+      const gridDivisions = this.boardSize.width * 2;
+      this.debugHelpers.gridHelper = new THREE.GridHelper(gridSize, gridDivisions);
+      this.scene.add(this.debugHelpers.gridHelper);
+    }
   }
 
   setupRenderer() {
@@ -184,6 +197,14 @@ export class Game {
     // Обновляем позицию вспомогательного объекта
     this.cubePositionHelper.position.x = worldX;
     this.cubePositionHelper.position.z = worldZ;
+    
+    // Сбрасываем подсветку целевых ячеек
+    this.board.updateTargetCellsHighlight(1);
+    
+    // Обновляем отладочную информацию
+    if (this.debugHelpers.enabled) {
+      this.updateDebugInfo();
+    }
   }
 
   animate() {
@@ -197,6 +218,11 @@ export class Game {
       // Если вращение завершено, проверяем, не попал ли кубик на целевую ячейку
       if (rotationCompleted) {
         this.checkTargetCell();
+        
+        // Обновляем отладочную информацию
+        if (this.debugHelpers.enabled) {
+          this.updateDebugInfo();
+        }
       }
       
       // Обновляем позицию вспомогательного объекта
@@ -222,23 +248,33 @@ export class Game {
     // Получаем текущую позицию кубика
     const { x, y } = this.cube.position;
     
-    // Получаем значение верхней грани кубика
-    const topValue = this.cube.getTopValue();
+    // Получаем значение нижней грани кубика
+    const bottomValue = this.cube.getBottomValue();
+    
+    // Определяем следующую цифру, которую нужно собрать
+    const nextNumberToCollect = this.collectedNumbers.size + 1;
     
     // Проверяем, находится ли кубик на целевой ячейке с соответствующим значением
-    if (this.board.checkTargetCell(x, y, topValue)) {
-      // Если значение еще не собрано, добавляем его
-      if (!this.collectedNumbers.has(topValue)) {
-        this.collectedNumbers.add(topValue);
+    // и является ли это значение следующим в последовательности
+    if (this.board.checkTargetCell(x, y, bottomValue) && bottomValue === nextNumberToCollect) {
+      // Добавляем собранное значение
+      this.collectedNumbers.add(bottomValue);
+      
+      // Обновляем подсветку целевых ячеек
+      this.board.updateTargetCellsHighlight(nextNumberToCollect + 1);
+      
+      // Уведомляем UI о изменении количества собранных цифр
+      if (this.onCollectedNumbersChanged) {
+        this.onCollectedNumbersChanged(this.collectedNumbers.size);
+      }
+      
+      // Если собраны все цифры, завершаем игру
+      if (this.collectedNumbers.size === this.board.getTargetCellsCount()) {
+        this.active = false;
         
-        // Уведомляем UI о изменении количества собранных цифр
-        if (this.onCollectedNumbersChanged) {
-          this.onCollectedNumbersChanged(this.collectedNumbers.size);
-        }
-        
-        // Если собраны все цифры, завершаем игру
-        if (this.collectedNumbers.size === this.board.getTargetCellsCount()) {
-          this.active = false;
+        // Уведомляем о завершении игры
+        if (this.onGameCompleted) {
+          this.onGameCompleted();
         }
       }
     }
@@ -249,6 +285,11 @@ export class Game {
     this.onCollectedNumbersChanged = handler;
   }
 
+  // Устанавливаем обработчик завершения игры
+  setGameCompletedHandler(handler) {
+    this.onGameCompleted = handler;
+  }
+
   // Проверяем, активна ли игра
   isActive() {
     return this.active;
@@ -257,5 +298,76 @@ export class Game {
   // Проверяем, вращается ли кубик
   isCubeRotating() {
     return this.cube.rotationInProgress;
+  }
+
+  // Обновляем отладочную информацию
+  updateDebugInfo() {
+    // Создаем или обновляем элемент для отображения отладочной информации
+    let debugInfoElement = document.getElementById('debug-info');
+    if (!debugInfoElement) {
+      debugInfoElement = document.createElement('div');
+      debugInfoElement.id = 'debug-info';
+      debugInfoElement.style.position = 'absolute';
+      debugInfoElement.style.top = '10px';
+      debugInfoElement.style.left = '10px';
+      debugInfoElement.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+      debugInfoElement.style.color = 'white';
+      debugInfoElement.style.padding = '10px';
+      debugInfoElement.style.fontFamily = 'monospace';
+      debugInfoElement.style.fontSize = '12px';
+      debugInfoElement.style.zIndex = '1000';
+      debugInfoElement.style.display = this.debugHelpers.enabled ? 'block' : 'none';
+      document.body.appendChild(debugInfoElement);
+    }
+    
+    // Обновляем содержимое
+    const { top, bottom, left, right, front, back } = this.cube.faceValues;
+    debugInfoElement.innerHTML = `
+      <div>Позиция: x=${this.cube.position.x}, y=${this.cube.position.y}</div>
+      <div>Грани:</div>
+      <div>- Верх: ${top}</div>
+      <div>- Низ: ${bottom}</div>
+      <div>- Лево: ${left}</div>
+      <div>- Право: ${right}</div>
+      <div>- Перед: ${front}</div>
+      <div>- Зад: ${back}</div>
+    `;
+  }
+
+  // Включить/выключить вспомогательные объекты для отладки
+  toggleDebugHelpers() {
+    this.debugHelpers.enabled = !this.debugHelpers.enabled;
+    
+    if (this.debugHelpers.enabled) {
+      // Включаем вспомогательные объекты
+      if (this.debugHelpers.axesHelper) {
+        this.scene.add(this.debugHelpers.axesHelper);
+      }
+      if (this.debugHelpers.gridHelper) {
+        this.scene.add(this.debugHelpers.gridHelper);
+      }
+      this.scene.add(this.cubePositionHelper);
+      this.cube.orientationHelpers.visible = true;
+      
+      // Обновляем отладочную информацию
+      this.updateDebugInfo();
+      document.getElementById('debug-info').style.display = 'block';
+    } else {
+      // Выключаем вспомогательные объекты
+      if (this.debugHelpers.axesHelper) {
+        this.scene.remove(this.debugHelpers.axesHelper);
+      }
+      if (this.debugHelpers.gridHelper) {
+        this.scene.remove(this.debugHelpers.gridHelper);
+      }
+      this.scene.remove(this.cubePositionHelper);
+      this.cube.orientationHelpers.visible = false;
+      
+      // Скрываем отладочную информацию
+      const debugInfoElement = document.getElementById('debug-info');
+      if (debugInfoElement) {
+        debugInfoElement.style.display = 'none';
+      }
+    }
   }
 }

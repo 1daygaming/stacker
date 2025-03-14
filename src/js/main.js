@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
     ui.updateCollectedNumbers(count);
   });
   
+  // Устанавливаем обработчик завершения игры
+  game.setGameCompletedHandler(() => {
+    ui.showEndScreen();
+  });
+  
   // Инициализируем игру
   game.init();
   

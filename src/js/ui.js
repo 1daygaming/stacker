@@ -8,6 +8,7 @@ export class UI {
     // Элементы UI
     this.movesCounterElement = document.getElementById('moves-counter');
     this.collectedNumbersElement = document.getElementById('collected-numbers');
+    this.nextNumberElement = document.getElementById('next-number');
     this.gameStartScreen = document.getElementById('game-start');
     this.gameEndScreen = document.getElementById('game-end');
     this.totalMovesElement = document.getElementById('total-moves');
@@ -19,6 +20,22 @@ export class UI {
     this.leftButton = document.getElementById('left-btn');
     this.rightButton = document.getElementById('right-btn');
     this.downButton = document.getElementById('down-btn');
+    
+    // Создаем элемент для отображения следующей цифры, если его нет
+    if (!this.nextNumberElement) {
+      this.nextNumberElement = document.createElement('div');
+      this.nextNumberElement.id = 'next-number';
+      this.nextNumberElement.style.position = 'absolute';
+      this.nextNumberElement.style.top = '50px';
+      this.nextNumberElement.style.right = '20px';
+      this.nextNumberElement.style.backgroundColor = 'rgba(76, 175, 80, 0.8)';
+      this.nextNumberElement.style.color = 'white';
+      this.nextNumberElement.style.padding = '10px 20px';
+      this.nextNumberElement.style.borderRadius = '5px';
+      this.nextNumberElement.style.fontWeight = 'bold';
+      this.nextNumberElement.style.fontSize = '18px';
+      document.body.appendChild(this.nextNumberElement);
+    }
   }
 
   init() {
@@ -57,6 +74,11 @@ export class UI {
         case 'ArrowDown':
         case 's':
           this.handleMove('down');
+          break;
+        case 'D': // Shift+D для переключения режима отладки
+          if (event.shiftKey) {
+            this.game.toggleDebugHelpers();
+          }
           break;
       }
     });
@@ -97,6 +119,15 @@ export class UI {
     
     // Обновляем счетчик собранных цифр
     this.collectedNumbersElement.textContent = `Собрано: ${this.collectedNumbers}/${this.totalTargetNumbers}`;
+    
+    // Обновляем информацию о следующей цифре
+    const nextNumber = this.collectedNumbers + 1;
+    if (nextNumber <= this.totalTargetNumbers) {
+      this.nextNumberElement.textContent = `Следующая цель: ${nextNumber}`;
+      this.nextNumberElement.style.display = 'block';
+    } else {
+      this.nextNumberElement.style.display = 'none';
+    }
   }
 
   updateCollectedNumbers(count) {
@@ -110,17 +141,45 @@ export class UI {
   }
 
   showStartScreen() {
+    // Добавляем информацию о правилах игры
+    const rulesElement = document.createElement('div');
+    rulesElement.className = 'rules';
+    rulesElement.innerHTML = `
+      <h2>Правила игры</h2>
+      <p>Перемещайте кубик по полю, чтобы совместить <strong>нижнюю грань</strong> кубика с соответствующей цифрой на клетке.</p>
+      <p>Собирайте цифры <strong>по порядку от 1 до 6</strong>. Текущая цель подсвечена зеленым цветом.</p>
+      <p>Соберите все 6 цифр, чтобы выиграть!</p>
+    `;
+    
+    // Проверяем, не добавлены ли уже правила
+    if (!this.gameStartScreen.querySelector('.rules')) {
+      this.gameStartScreen.insertBefore(rulesElement, this.startButton);
+    }
+    
     this.gameStartScreen.classList.remove('hidden');
     this.gameEndScreen.classList.add('hidden');
+    
+    // Скрываем индикатор следующей цифры на стартовом экране
+    if (this.nextNumberElement) {
+      this.nextNumberElement.style.display = 'none';
+    }
   }
 
   hideStartScreen() {
     this.gameStartScreen.classList.add('hidden');
+    
+    // Показываем индикатор следующей цифры при начале игры
+    this.updateCounters();
   }
 
   showEndScreen() {
     this.totalMovesElement.textContent = this.movesCounter;
     this.gameEndScreen.classList.remove('hidden');
+    
+    // Скрываем индикатор следующей цифры на экране победы
+    if (this.nextNumberElement) {
+      this.nextNumberElement.style.display = 'none';
+    }
   }
 
   hideEndScreen() {
