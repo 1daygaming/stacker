@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stacker - Головоломка с кубиком</title>
+  <script type="module" crossorigin src="/stacker/assets/index-6cqincpa.js"></script>
+  <link rel="stylesheet" crossorigin href="/stacker/assets/index-BDepzu4m.css">
+</head>
+<body>
+  <div id="game-container">
+    <div id="game-canvas"></div>
+    <div id="ui-container">
+      <div id="game-info">
+        <div id="moves-counter">Ходы: 0</div>
+        <div id="collected-numbers">Собрано: 0/6</div>
+      </div>
+      <div id="mobile-controls">
+        <div id="controls-pad">
+          <button id="up-btn" class="control-btn">↑</button>
+          <button id="left-btn" class="control-btn">←</button>
+          <button id="right-btn" class="control-btn">→</button>
+          <button id="down-btn" class="control-btn">↓</button>
+        </div>
+      </div>
+    </div>
+    <div id="game-start" class="game-screen">
+      <h1>Stacker</h1>
+      <p>Перекатывайте кубик и собирайте цифры от 1 до 6 в правильном порядке!</p>
+      <button id="start-btn">Начать игру</button>
+    </div>
+    <div id="game-end" class="game-screen hidden">
+      <h1>Победа!</h1>
+      <p>Вы собрали все цифры за <span id="total-moves">0</span> ходов!</p>
+      <button id="restart-btn">Играть снова</button>
+    </div>
+  </div>
+</body>
+</html> 
